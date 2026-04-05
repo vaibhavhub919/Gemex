@@ -1,0 +1,36 @@
+@import url("https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Poppins:wght@500;600;700;800&display=swap");
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html {
+    -webkit-text-size-adjust: 100%;
+  }
+
+  body {
+    @apply bg-sand text-slate-700 antialiased;
+  }
+
+  * {
+    @apply box-border;
+  }
+
+  img {
+    @apply max-w-full;
+  }
+}
+
+@layer components {
+  .input-field {
+    @apply w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-ink outline-none transition placeholder:text-slate-400 focus:border-primary focus:bg-white;
+  }
+}
+
+.bg-app-gradient {
+  background:
+    radial-gradient(circle at top left, rgba(251, 191, 36, 0.34), transparent 30%),
+    radial-gradient(circle at top right, rgba(239, 68, 68, 0.2), transparent 28%),
+    linear-gradient(180deg, #fff7ed 0%, #fffdf8 45%, #f8fafc 100%);
+}
