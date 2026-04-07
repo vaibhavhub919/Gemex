@@ -67,7 +67,7 @@ const Home = ({ user }) => {
   };
 
   return (
-    <section className="mx-auto max-w-7xl px-4 py-6 sm:py-8 lg:px-8">
+    <section className="tournament-shell mx-auto max-w-7xl rounded-[40px] px-4 py-6 sm:px-5 sm:py-8 lg:px-8">
       <div className="grid gap-6 overflow-hidden rounded-[32px] bg-gradient-to-r from-amber-100 via-orange-50 to-red-100 p-5 shadow-card lg:grid-cols-[0.85fr_1.15fr] lg:p-8">
         <div className="flex flex-col justify-center">
           <p className="text-sm font-bold uppercase tracking-[0.35em] text-primary">Live lobby</p>
@@ -139,7 +139,7 @@ const Home = ({ user }) => {
       </div>
 
       {!tournaments.length && (
-        <div className="mt-8 rounded-[28px] bg-white p-8 text-center shadow-card">
+        <div className="tournament-card mt-8 text-center">
           <p className="text-lg font-semibold text-ink">No tournaments available right now.</p>
           <p className="mt-2 text-sm text-slate-500">Create one from admin dashboard later.</p>
         </div>

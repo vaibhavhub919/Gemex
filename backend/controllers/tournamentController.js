@@ -184,12 +184,6 @@ export const deleteTournament = async (req, res) => {
       return res.status(404).json({ message: "Tournament not found." });
     }
 
-    if (tournament.status !== "completed") {
-      return res
-        .status(400)
-        .json({ message: "Only completed tournaments can be deleted." });
-    }
-
     await Promise.all([
       User.updateMany(
         { joinedTournaments: tournament._id },

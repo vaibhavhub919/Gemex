@@ -103,8 +103,8 @@ const AdminDashboard = () => {
   const handleTournamentDelete = async (id) => {
     const tournament = tournaments.find((item) => item._id === id);
 
-    if (!tournament || tournament.status !== "completed") {
-      setError("Only completed tournaments can be deleted.");
+    if (!tournament) {
+      setError("Tournament not found.");
       setMessage("");
       return;
     }
@@ -248,10 +248,13 @@ const AdminDashboard = () => {
   };
 
   return (
-    <section className="mx-auto max-w-7xl px-4 py-6 sm:py-8 lg:px-8">
+    <section className="admin-panel-shell mx-auto max-w-7xl rounded-[40px] px-4 py-6 sm:px-5 sm:py-8 lg:px-8">
       <div className="mb-8">
         <p className="text-sm font-bold uppercase tracking-[0.3em] text-primary">Admin panel</p>
         <h1 className="mt-3 font-heading text-3xl font-bold text-ink sm:text-4xl">Dashboard Overview</h1>
+        <p className="mt-2 max-w-2xl text-sm text-slate-500 sm:text-base">
+          Tournament management, wallet approvals aur live room control ek hi jagah se handle karo.
+        </p>
       </div>
 
       {(message || error) && (
@@ -272,7 +275,7 @@ const AdminDashboard = () => {
           ["Pending Withdrawals", stats.pendingWithdrawals],
           ["Transactions", stats.totalTransactions]
         ].map(([label, value]) => (
-          <div key={label} className="rounded-[28px] bg-white p-5 shadow-card sm:p-6">
+          <div key={label} className="admin-card rounded-[28px]">
             <p className="text-sm font-bold uppercase tracking-[0.2em] text-slate-400">{label}</p>
             <p className="mt-3 font-heading text-3xl font-bold text-ink sm:text-4xl">{value ?? 0}</p>
           </div>
@@ -280,7 +283,7 @@ const AdminDashboard = () => {
       </div>
 
       <div className="mt-8 grid gap-8 xl:grid-cols-[0.95fr_1.05fr]">
-        <div className="rounded-[32px] bg-white p-5 shadow-card sm:p-6">
+        <div className="admin-card">
           <h2 className="font-heading text-xl font-semibold text-ink sm:text-2xl">Create Tournament</h2>
           <form className="mt-5 grid gap-4" onSubmit={handleTournamentCreate}>
             <input className="input-field" placeholder="Title" value={tournamentForm.title} onChange={(event) => setTournamentForm((current) => ({ ...current, title: event.target.value }))} required />
@@ -292,22 +295,22 @@ const AdminDashboard = () => {
               <input className="input-field" placeholder="Max Participants" type="number" value={tournamentForm.maxParticipants} onChange={(event) => setTournamentForm((current) => ({ ...current, maxParticipants: event.target.value }))} required />
               <input className="input-field" type="datetime-local" value={tournamentForm.startTime} onChange={(event) => setTournamentForm((current) => ({ ...current, startTime: event.target.value }))} required />
             </div>
-            <button type="submit" className="rounded-full bg-ink px-5 py-3 text-sm font-semibold text-white">
+            <button type="submit" className="admin-action-btn bg-ink hover:bg-slate-800">
               Create Tournament
             </button>
           </form>
         </div>
 
         <div className="space-y-8">
-          <div className="rounded-[32px] bg-white p-5 shadow-card sm:p-6">
+          <div className="admin-card">
             <h2 className="font-heading text-xl font-semibold text-ink sm:text-2xl">Deposit QR</h2>
             <form className="mt-4 space-y-4" onSubmit={handlePaymentSettingsSave}>
-              <label className="block rounded-3xl border border-dashed border-slate-300 bg-slate-50 p-4 text-sm text-slate-500">
+              <label className="block rounded-3xl border border-dashed border-slate-300 bg-gradient-to-br from-slate-50 to-orange-50/60 p-4 text-sm text-slate-500 transition duration-300 hover:border-primary hover:shadow-md">
                 <span className="mb-3 block font-semibold text-ink">Upload QR Image</span>
                 <input type="file" accept="image/*" onChange={handleQrFileChange} />
               </label>
               {paymentSettings.depositQrImageUrl && (
-                <div className="rounded-3xl border border-slate-200 bg-mist p-4">
+                <div className="rounded-3xl border border-slate-200 bg-mist p-4 shadow-inner">
                   <img
                     src={paymentSettings.depositQrImageUrl}
                     alt="Deposit QR preview"
@@ -316,13 +319,13 @@ const AdminDashboard = () => {
                 </div>
               )}
               <div className="flex flex-wrap gap-3">
-                <button type="submit" className="rounded-full bg-ink px-5 py-3 text-sm font-semibold text-white">
+                <button type="submit" className="admin-action-btn bg-ink hover:bg-slate-800">
                   Save QR
                 </button>
                 {paymentSettings.depositQrImageUrl && (
                   <button
                     type="button"
-                    className="rounded-full border border-slate-300 px-5 py-3 text-sm font-semibold text-slate-600"
+                    className="admin-secondary-btn"
                     onClick={() =>
                       setPaymentSettings((current) => ({
                         ...current,
@@ -337,19 +340,19 @@ const AdminDashboard = () => {
             </form>
           </div>
 
-          <div className="rounded-[32px] bg-white p-5 shadow-card sm:p-6">
+          <div className="admin-card">
             <h2 className="font-heading text-xl font-semibold text-ink sm:text-2xl">Pending Deposits</h2>
             <div className="mt-4 space-y-3">
               {requests.deposits?.map((item) => (
-                <div key={item._id} className="rounded-2xl bg-mist p-4">
+                <div key={item._id} className="admin-soft-card">
                   <p className="font-semibold text-ink">{item.user?.name}</p>
                   <p className="mt-1 text-sm text-slate-500">Amount: Rs. {item.amount}</p>
                   <p className="text-sm text-slate-500">UPI Transaction ID: {item.upiTransactionId}</p>
                   <div className="mt-3 flex flex-col gap-3 sm:flex-row">
-                    <button type="button" className="rounded-full bg-green-600 px-4 py-2 text-sm font-semibold text-white" onClick={() => reviewRequest("deposit", item._id, "approved")}>
+                    <button type="button" className="admin-action-btn bg-green-600 px-4 py-2 hover:bg-green-700" onClick={() => reviewRequest("deposit", item._id, "approved")}>
                       Approve
                     </button>
-                    <button type="button" className="rounded-full bg-red-500 px-4 py-2 text-sm font-semibold text-white" onClick={() => reviewRequest("deposit", item._id, "rejected")}>
+                    <button type="button" className="admin-action-btn bg-red-500 px-4 py-2 hover:bg-red-600" onClick={() => reviewRequest("deposit", item._id, "rejected")}>
                       Reject
                     </button>
                   </div>
@@ -359,20 +362,20 @@ const AdminDashboard = () => {
             </div>
           </div>
 
-          <div className="rounded-[32px] bg-white p-5 shadow-card sm:p-6">
+          <div className="admin-card">
             <h2 className="font-heading text-xl font-semibold text-ink sm:text-2xl">Pending Withdrawals</h2>
             <div className="mt-4 space-y-3">
               {requests.withdrawals?.map((item) => (
-                <div key={item._id} className="rounded-2xl bg-mist p-4">
+                <div key={item._id} className="admin-soft-card">
                   <p className="font-semibold text-ink">{item.user?.name}</p>
                   <p className="text-sm text-slate-500">
                     Rs. {item.amount} • {item.upiId}
                   </p>
                   <div className="mt-3 flex flex-col gap-3 sm:flex-row">
-                    <button type="button" className="rounded-full bg-green-600 px-4 py-2 text-sm font-semibold text-white" onClick={() => reviewRequest("withdrawal", item._id, "approved")}>
+                    <button type="button" className="admin-action-btn bg-green-600 px-4 py-2 hover:bg-green-700" onClick={() => reviewRequest("withdrawal", item._id, "approved")}>
                       Approve
                     </button>
-                    <button type="button" className="rounded-full bg-red-500 px-4 py-2 text-sm font-semibold text-white" onClick={() => reviewRequest("withdrawal", item._id, "rejected")}>
+                    <button type="button" className="admin-action-btn bg-red-500 px-4 py-2 hover:bg-red-600" onClick={() => reviewRequest("withdrawal", item._id, "rejected")}>
                       Reject
                     </button>
                   </div>
@@ -384,24 +387,23 @@ const AdminDashboard = () => {
         </div>
       </div>
 
-      <div className="mt-8 rounded-[32px] bg-white p-5 shadow-card sm:p-6">
+      <div className="admin-card mt-8">
         <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
           <h2 className="font-heading text-xl font-semibold text-ink sm:text-2xl">Tournaments</h2>
         </div>
         <div className="mt-4 space-y-3">
           {tournaments.map((item) => {
-            const isCompleted = item.status === "completed";
             const roomAccessState = getRoomAccessState(item);
             const roomForm = roomForms[item._id] || { roomId: item.roomId || "", roomPassword: item.roomPassword || "" };
 
             return (
-              <div key={item._id} className="rounded-2xl bg-mist p-4">
+              <div key={item._id} className="admin-soft-card">
                 <div className="flex flex-col gap-4">
                   <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
                     <div>
                       <div className="flex flex-wrap items-center gap-2">
                         <p className="font-semibold text-ink">{item.title}</p>
-                        <span className="rounded-full bg-white px-3 py-1 text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">
+                        <span className="admin-status-pill">
                           {item.status}
                         </span>
                       </div>
@@ -416,11 +418,9 @@ const AdminDashboard = () => {
 
                     <button
                       type="button"
-                      className={`rounded-full px-4 py-2 text-sm font-semibold text-white ${
-                        isCompleted ? "bg-red-500" : "bg-slate-300"
-                      }`}
+                      className="admin-action-btn bg-red-500 px-4 py-2 hover:bg-red-600"
                       onClick={() => handleTournamentDelete(item._id)}
-                      disabled={!isCompleted || deletingTournamentId === item._id}
+                      disabled={deletingTournamentId === item._id}
                     >
                       {deletingTournamentId === item._id ? "Deleting..." : "Delete Tournament"}
                     </button>
@@ -447,7 +447,7 @@ const AdminDashboard = () => {
                     <div className="mt-3 flex flex-col gap-3 sm:flex-row sm:items-center">
                       <button
                         type="button"
-                        className={`rounded-full px-4 py-2 text-sm font-semibold text-white ${
+                        className={`admin-action-btn px-4 py-2 ${
                           roomAccessState.allowed ? "bg-ink" : "bg-slate-300"
                         }`}
                         onClick={() => handleRoomDetailsSave(item)}
@@ -470,7 +470,7 @@ const AdminDashboard = () => {
         </div>
       </div>
 
-      <div className="mt-8 rounded-[32px] bg-white p-5 shadow-card sm:p-6">
+      <div className="admin-card mt-8">
         <h2 className="font-heading text-xl font-semibold text-ink sm:text-2xl">Users</h2>
         <div className="mt-4 overflow-x-auto">
           <table className="min-w-[620px] text-left text-sm">
@@ -484,7 +484,7 @@ const AdminDashboard = () => {
             </thead>
             <tbody>
               {users.map((item) => (
-                <tr key={item._id} className="border-b border-slate-100">
+                <tr key={item._id} className="admin-table-row">
                   <td className="py-4 font-semibold text-ink">{item.name}</td>
                   <td className="py-4 text-slate-600">{item.email}</td>
                   <td className="py-4 capitalize text-slate-600">{item.role}</td>

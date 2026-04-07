@@ -28,17 +28,19 @@ const MyTournaments = () => {
   }, [tab, tournaments]);
 
   return (
-    <section className="mx-auto max-w-6xl px-4 py-6 sm:py-8 lg:px-8">
+    <section className="tournament-shell mx-auto max-w-6xl rounded-[40px] px-4 py-6 sm:px-5 sm:py-8 lg:px-8">
       <div className="mb-8 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <p className="text-sm font-bold uppercase tracking-[0.3em] text-primary">Joined matches</p>
           <h1 className="mt-2 font-heading text-3xl font-bold text-ink sm:text-4xl">My Tournaments</h1>
         </div>
-        <div className="flex w-full flex-col rounded-[24px] bg-white p-1 shadow-card sm:w-auto sm:flex-row sm:rounded-full">
+        <div className="flex w-full flex-col rounded-[24px] border border-orange-100 bg-white/90 p-1 shadow-card sm:w-auto sm:flex-row sm:rounded-full">
           <button
             type="button"
-            className={`rounded-full px-4 py-3 text-sm font-semibold ${
-              tab === "active" ? "bg-ink text-white" : "text-slate-500"
+            className={`tournament-tab ${
+              tab === "active"
+                ? "bg-gradient-to-r from-amber-500 to-orange-500 text-white shadow-md"
+                : "text-slate-500 hover:bg-orange-50"
             }`}
             onClick={() => setTab("active")}
           >
@@ -46,8 +48,10 @@ const MyTournaments = () => {
           </button>
           <button
             type="button"
-            className={`rounded-full px-4 py-3 text-sm font-semibold ${
-              tab === "completed" ? "bg-ink text-white" : "text-slate-500"
+            className={`tournament-tab ${
+              tab === "completed"
+                ? "bg-gradient-to-r from-amber-500 to-orange-500 text-white shadow-md"
+                : "text-slate-500 hover:bg-orange-50"
             }`}
             onClick={() => setTab("completed")}
           >
@@ -60,7 +64,7 @@ const MyTournaments = () => {
 
       <div className="grid gap-5">
         {filtered.map((tournament) => (
-          <div key={tournament._id} className="rounded-[28px] bg-white p-5 shadow-card sm:p-6">
+          <div key={tournament._id} className="tournament-card">
             <div className="flex flex-col justify-between gap-5 lg:flex-row lg:items-center">
               <div>
                 <p className="text-xs font-bold uppercase tracking-[0.3em] text-primary">
@@ -75,17 +79,17 @@ const MyTournaments = () => {
               </div>
 
               <div className="grid gap-3 sm:grid-cols-3">
-                <div className="rounded-2xl bg-mist p-4">
+                <div className="tournament-stat">
                   <p className="text-xs uppercase tracking-[0.3em] text-slate-400">Status</p>
                   <p className="mt-2 font-semibold capitalize text-ink">{tournament.status}</p>
                 </div>
-                <div className="rounded-2xl bg-mist p-4">
+                <div className="tournament-stat">
                   <p className="text-xs uppercase tracking-[0.3em] text-slate-400">Room ID</p>
                   <p className="mt-2 font-semibold text-ink">
                     {tournament.status === "live" ? tournament.roomId || "Awaited" : "--"}
                   </p>
                 </div>
-                <div className="rounded-2xl bg-mist p-4">
+                <div className="tournament-stat">
                   <p className="text-xs uppercase tracking-[0.3em] text-slate-400">Password</p>
                   <p className="mt-2 font-semibold text-ink">
                     {tournament.status === "live" ? tournament.roomPassword || "Awaited" : "--"}
@@ -98,7 +102,7 @@ const MyTournaments = () => {
       </div>
 
       {!filtered.length && (
-        <div className="rounded-[28px] bg-white p-8 text-center shadow-card">
+        <div className="tournament-card text-center">
           <p className="text-lg font-semibold text-ink">No tournaments found in this tab.</p>
         </div>
       )}
