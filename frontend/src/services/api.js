@@ -4,6 +4,31 @@ const api = axios.create({
   baseURL: "https://gemex.onrender.com/api" || "http://localhost:5000/api"
 });
 
+const hasExplicitTimezone = (value) => /([zZ]|[+-]\d{2}:\d{2})$/.test(value);
+
+const normalizeLocalDateTime = (value) => {
+  if (typeof value !== "string" || !value) {
+    return value;
+  }
+
+  if (hasExplicitTimezone(value)) {
+    return value;
+  }
+
+  const parsedDate = new Date(value);
+
+  if (Number.isNaN(parsedDate.getTime())) {
+    return value;
+  }
+
+  return parsedDate.toISOString();
+};
+
+const normalizeTournamentPayload = (payload) => ({
+  ...payload,
+  startTime: normalizeLocalDateTime(payload?.startTime)
+});
+
 api.interceptors.request.use((config) => {
   const token = localStorage.getItem("token");
 
@@ -25,7 +50,7 @@ export const tournamentApi = {
   getAll: () => api.get("/tournaments"),
   getMine: () => api.get("/tournaments/mine"),
   join: (id) => api.post(`/tournaments/${id}/join`),
-  create: (payload) => api.post("/tournaments", payload),
+  create: (payload) => api.post("/tournaments", normalizeTournamentPayload(payload)),
   updateStatus: (id, payload) => api.put(`/tournaments/${id}/status`, payload),
   updateRoomDetails: (id, payload) => api.put(`/tournaments/${id}/room-details`, payload),
   declareWinner: (id, payload) => api.put(`/tournaments/${id}/winner`, payload),
