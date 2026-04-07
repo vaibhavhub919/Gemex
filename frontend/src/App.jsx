@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { Navigate, Route, Routes } from "react-router-dom";
+import { ToastContainer } from "react-toastify";
 import BottomNav from "./components/BottomNav";
 import Navbar from "./components/Navbar";
 import AdminDashboard from "./pages/AdminDashboard";
@@ -9,6 +10,7 @@ import MyTournaments from "./pages/MyTournaments";
 import Profile from "./pages/Profile";
 import Wallet from "./pages/Wallet";
 import { authApi } from "./services/api";
+import { notifyInfo } from "./services/notify";
 
 const ProtectedRoute = ({ user, children, adminOnly = false }) => {
   if (!user) {
@@ -69,6 +71,7 @@ const App = () => {
     localStorage.removeItem("token");
     localStorage.removeItem("user");
     setUser(null);
+    notifyInfo("Logged out successfully.");
   };
 
   if (booting) {
@@ -122,6 +125,7 @@ const App = () => {
         />
       </Routes>
       {user && <BottomNav isAdmin={user.role === "admin"} />}
+      <ToastContainer newestOnTop theme="colored" />
     </div>
   );
 };

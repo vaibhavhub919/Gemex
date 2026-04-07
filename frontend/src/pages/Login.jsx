@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { authApi } from "../services/api";
+import { getErrorMessage, notifySuccess, notifyError } from "../services/notify";
 
 const initialForm = {
   name: "",
@@ -12,7 +13,6 @@ const Login = ({ onAuthSuccess }) => {
   const [tab, setTab] = useState("login");
   const [form, setForm] = useState(initialForm);
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState("");
 
   const updateField = (event) => {
     setForm((current) => ({
@@ -23,7 +23,6 @@ const Login = ({ onAuthSuccess }) => {
 
   const handleSubmit = async (event) => {
     event.preventDefault();
-    setError("");
     setLoading(true);
 
     try {
@@ -31,8 +30,9 @@ const Login = ({ onAuthSuccess }) => {
         tab === "login" ? await authApi.login(form) : await authApi.register(form);
 
       onAuthSuccess(response.data);
+      notifySuccess(tab === "login" ? "Login successful." : "Account created successfully.");
     } catch (requestError) {
-      setError(requestError.response?.data?.message || "Request failed.");
+      notifyError(getErrorMessage(requestError, "Request failed."));
     } finally {
       setLoading(false);
     }
@@ -108,9 +108,6 @@ const Login = ({ onAuthSuccess }) => {
               placeholder="Password"
               required
             />
-
-            {error && <p className="text-sm font-medium text-red-500">{error}</p>}
-
             <button
               type="submit"
               disabled={loading}

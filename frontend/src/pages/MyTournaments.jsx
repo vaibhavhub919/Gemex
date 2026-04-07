@@ -1,10 +1,10 @@
 import { useEffect, useMemo, useState } from "react";
 import { tournamentApi } from "../services/api";
+import { getErrorMessage, notifyError } from "../services/notify";
 
 const MyTournaments = () => {
   const [tab, setTab] = useState("active");
   const [tournaments, setTournaments] = useState([]);
-  const [error, setError] = useState("");
 
   useEffect(() => {
     const loadMine = async () => {
@@ -12,7 +12,7 @@ const MyTournaments = () => {
         const response = await tournamentApi.getMine();
         setTournaments(response.data.tournaments || []);
       } catch (requestError) {
-        setError(requestError.response?.data?.message || "Failed to load tournaments.");
+        notifyError(getErrorMessage(requestError, "Failed to load tournaments."));
       }
     };
 
@@ -59,8 +59,6 @@ const MyTournaments = () => {
           </button>
         </div>
       </div>
-
-      {error && <p className="rounded-2xl bg-red-50 px-4 py-3 text-sm text-red-600">{error}</p>}
 
       <div className="grid gap-5">
         {filtered.map((tournament) => (

@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import TournamentCard from "../components/TournamentCard";
 import { tournamentApi } from "../services/api";
+import { getErrorMessage, notifyError, notifySuccess } from "../services/notify";
 
 const heroImages = Object.values(
   import.meta.glob("../assets/home-slider/*.{png,jpg,jpeg,webp,avif}", {
@@ -12,7 +13,6 @@ const heroImages = Object.values(
 const Home = ({ user }) => {
   const [tournaments, setTournaments] = useState([]);
   const [joiningId, setJoiningId] = useState("");
-  const [error, setError] = useState("");
   const [activeSlide, setActiveSlide] = useState(0);
 
   const loadTournaments = async () => {
@@ -20,7 +20,7 @@ const Home = ({ user }) => {
       const response = await tournamentApi.getAll();
       setTournaments(response.data.tournaments || []);
     } catch (requestError) {
-      setError(requestError.response?.data?.message || "Failed to load tournaments.");
+      notifyError(getErrorMessage(requestError, "Failed to load tournaments."));
     }
   };
 
@@ -50,17 +50,17 @@ const Home = ({ user }) => {
 
   const handleJoin = async (id) => {
     if (!user) {
-      setError("Please login first to join a tournament.");
+      notifyError("Please login first to join a tournament.");
       return;
     }
 
     try {
       setJoiningId(id);
-      setError("");
       await tournamentApi.join(id);
+      notifySuccess("Tournament joined successfully.");
       await loadTournaments();
     } catch (requestError) {
-      setError(requestError.response?.data?.message || "Unable to join tournament.");
+      notifyError(getErrorMessage(requestError, "Unable to join tournament."));
     } finally {
       setJoiningId("");
     }
@@ -121,8 +121,6 @@ const Home = ({ user }) => {
           )}
         </div>
       </div>
-
-      {error && <p className="mt-6 rounded-2xl bg-red-50 px-4 py-3 text-sm text-red-600">{error}</p>}
 
       <div className="mt-8 grid gap-6 lg:grid-cols-2 xl:grid-cols-3">
         {tournaments.map((tournament) => (

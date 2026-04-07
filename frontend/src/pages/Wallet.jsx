@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import Modal from "../components/Modal";
 import { walletApi } from "../services/api";
+import { getErrorMessage, notifyError, notifySuccess } from "../services/notify";
 
 const Wallet = () => {
   const [wallet, setWallet] = useState({
@@ -11,7 +12,6 @@ const Wallet = () => {
     upiId: "",
     depositQrImageUrl: ""
   });
-  const [error, setError] = useState("");
   const [depositOpen, setDepositOpen] = useState(false);
   const [withdrawOpen, setWithdrawOpen] = useState(false);
   const [depositForm, setDepositForm] = useState({ amount: "", upiTransactionId: "" });
@@ -22,7 +22,7 @@ const Wallet = () => {
       const response = await walletApi.getOverview();
       setWallet(response.data);
     } catch (requestError) {
-      setError(requestError.response?.data?.message || "Failed to load wallet.");
+      notifyError(getErrorMessage(requestError, "Failed to load wallet."));
     }
   };
 
@@ -39,9 +39,10 @@ const Wallet = () => {
       });
       setDepositOpen(false);
       setDepositForm({ amount: "", upiTransactionId: "" });
+      notifySuccess("Deposit request submitted successfully.");
       await loadWallet();
     } catch (requestError) {
-      setError(requestError.response?.data?.message || "Deposit request failed.");
+      notifyError(getErrorMessage(requestError, "Deposit request failed."));
     }
   };
 
@@ -54,9 +55,10 @@ const Wallet = () => {
       });
       setWithdrawOpen(false);
       setWithdrawForm({ amount: "", upiId: "" });
+      notifySuccess("Withdrawal request submitted successfully.");
       await loadWallet();
     } catch (requestError) {
-      setError(requestError.response?.data?.message || "Withdrawal request failed.");
+      notifyError(getErrorMessage(requestError, "Withdrawal request failed."));
     }
   };
 
@@ -92,7 +94,6 @@ const Wallet = () => {
               {wallet.transactions.length} items
             </span>
           </div>
-          {error && <p className="mb-4 rounded-2xl bg-red-50 px-4 py-3 text-sm text-red-600">{error}</p>}
           <div className="space-y-3">
             {wallet.transactions.map((item) => (
               <div key={item._id} className="flex flex-col gap-2 rounded-2xl bg-mist p-4 sm:flex-row sm:items-center sm:justify-between">

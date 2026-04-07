@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { adminApi, tournamentApi } from "../services/api";
+import { getErrorMessage, notifyError, notifySuccess } from "../services/notify";
 
 const emptyTournament = {
   title: "",
@@ -21,8 +22,6 @@ const AdminDashboard = () => {
   const [roomForms, setRoomForms] = useState({});
   const [savingRoomId, setSavingRoomId] = useState("");
   const [deletingTournamentId, setDeletingTournamentId] = useState("");
-  const [message, setMessage] = useState("");
-  const [error, setError] = useState("");
   const [currentTime, setCurrentTime] = useState(Date.now());
 
   const loadDashboard = async () => {
@@ -50,7 +49,7 @@ const AdminDashboard = () => {
       setPaymentSettings(settingsRes.data.settings || { depositQrImageUrl: "" });
       setRequests(requestsRes.data);
     } catch (requestError) {
-      setError(requestError.response?.data?.message || "Failed to load admin dashboard.");
+      notifyError(getErrorMessage(requestError, "Failed to load admin dashboard."));
     }
   };
 
@@ -75,15 +74,14 @@ const AdminDashboard = () => {
       }
 
       await loadDashboard();
+      notifySuccess(`${type === "deposit" ? "Deposit" : "Withdrawal"} request ${status}.`);
     } catch (requestError) {
-      setError(requestError.response?.data?.message || "Review action failed.");
+      notifyError(getErrorMessage(requestError, "Review action failed."));
     }
   };
 
   const handleTournamentCreate = async (event) => {
     event.preventDefault();
-    setError("");
-    setMessage("");
 
     try {
       await tournamentApi.create({
@@ -93,10 +91,10 @@ const AdminDashboard = () => {
         maxParticipants: Number(tournamentForm.maxParticipants)
       });
       setTournamentForm(emptyTournament);
-      setMessage("Tournament created successfully.");
+      notifySuccess("Tournament created successfully.");
       await loadDashboard();
     } catch (requestError) {
-      setError(requestError.response?.data?.message || "Tournament creation failed.");
+      notifyError(getErrorMessage(requestError, "Tournament creation failed."));
     }
   };
 
@@ -104,8 +102,7 @@ const AdminDashboard = () => {
     const tournament = tournaments.find((item) => item._id === id);
 
     if (!tournament) {
-      setError("Tournament not found.");
-      setMessage("");
+      notifyError("Tournament not found.");
       return;
     }
 
@@ -114,15 +111,13 @@ const AdminDashboard = () => {
     }
 
     setDeletingTournamentId(id);
-    setError("");
-    setMessage("");
 
     try {
       await tournamentApi.delete(id);
-      setMessage("Tournament deleted successfully.");
+      notifySuccess("Tournament deleted successfully.");
       await loadDashboard();
     } catch (requestError) {
-      setError(requestError.response?.data?.message || "Tournament deletion failed.");
+      notifyError(getErrorMessage(requestError, "Tournament deletion failed."));
     } finally {
       setDeletingTournamentId("");
     }
@@ -130,15 +125,13 @@ const AdminDashboard = () => {
 
   const handlePaymentSettingsSave = async (event) => {
     event.preventDefault();
-    setError("");
-    setMessage("");
 
     try {
       const response = await adminApi.updatePaymentSettings(paymentSettings);
       setPaymentSettings(response.data.settings || { depositQrImageUrl: "" });
-      setMessage("Deposit QR updated successfully.");
+      notifySuccess("Deposit QR updated successfully.");
     } catch (requestError) {
-      setError(requestError.response?.data?.message || "Failed to update deposit QR.");
+      notifyError(getErrorMessage(requestError, "Failed to update deposit QR."));
     }
   };
 
@@ -193,22 +186,19 @@ const AdminDashboard = () => {
   const handleRoomDetailsSave = async (tournament) => {
     const accessState = getRoomAccessState(tournament);
     if (!accessState.allowed) {
-      setError(accessState.message);
-      setMessage("");
+      notifyError(accessState.message);
       return;
     }
 
     const form = roomForms[tournament._id] || { roomId: "", roomPassword: "" };
     setSavingRoomId(tournament._id);
-    setError("");
-    setMessage("");
 
     try {
       await tournamentApi.updateRoomDetails(tournament._id, form);
-      setMessage("Room details updated successfully.");
+      notifySuccess("Room details updated successfully.");
       await loadDashboard();
     } catch (requestError) {
-      setError(requestError.response?.data?.message || "Failed to update room details.");
+      notifyError(getErrorMessage(requestError, "Failed to update room details."));
     } finally {
       setSavingRoomId("");
     }
@@ -222,8 +212,7 @@ const AdminDashboard = () => {
     }
 
     if (!file.type.startsWith("image/")) {
-      setError("Please upload an image file for the deposit QR.");
-      setMessage("");
+      notifyError("Please upload an image file for the deposit QR.");
       event.target.value = "";
       return;
     }
@@ -235,12 +224,10 @@ const AdminDashboard = () => {
         ...current,
         depositQrImageUrl: typeof reader.result === "string" ? reader.result : ""
       }));
-      setError("");
     };
 
     reader.onerror = () => {
-      setError("Unable to read the selected QR image.");
-      setMessage("");
+      notifyError("Unable to read the selected QR image.");
     };
 
     reader.readAsDataURL(file);
@@ -256,16 +243,6 @@ const AdminDashboard = () => {
           Tournament management, wallet approvals aur live room control ek hi jagah se handle karo.
         </p>
       </div>
-
-      {(message || error) && (
-        <p
-          className={`mb-6 rounded-2xl px-4 py-3 text-sm ${
-            error ? "bg-red-50 text-red-600" : "bg-green-50 text-green-600"
-          }`}
-        >
-          {error || message}
-        </p>
-      )}
 
       <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-5">
         {[

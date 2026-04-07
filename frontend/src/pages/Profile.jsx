@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { authApi } from "../services/api";
+import { getErrorMessage, notifyError, notifySuccess } from "../services/notify";
 
 const Profile = ({ user, onProfileUpdate }) => {
   const [form, setForm] = useState({
@@ -9,8 +10,6 @@ const Profile = ({ user, onProfileUpdate }) => {
     upiId: user?.upiId || "",
     password: ""
   });
-  const [message, setMessage] = useState("");
-  const [error, setError] = useState("");
 
   const handleChange = (event) => {
     setForm((current) => ({
@@ -21,16 +20,14 @@ const Profile = ({ user, onProfileUpdate }) => {
 
   const handleSubmit = async (event) => {
     event.preventDefault();
-    setMessage("");
-    setError("");
 
     try {
       const response = await authApi.updateProfile(form);
       onProfileUpdate(response.data.user);
-      setMessage("Profile updated successfully.");
+      notifySuccess("Profile updated successfully.");
       setForm((current) => ({ ...current, password: "" }));
     } catch (requestError) {
-      setError(requestError.response?.data?.message || "Profile update failed.");
+      notifyError(getErrorMessage(requestError, "Profile update failed."));
     }
   };
 
@@ -62,10 +59,6 @@ const Profile = ({ user, onProfileUpdate }) => {
               placeholder="New password (optional)"
             />
           </div>
-
-          {message && <p className="md:col-span-2 text-sm font-medium text-green-600">{message}</p>}
-          {error && <p className="md:col-span-2 text-sm font-medium text-red-500">{error}</p>}
-
           <div className="md:col-span-2">
             <button type="submit" className="w-full rounded-full bg-ink px-6 py-3 text-sm font-semibold text-white sm:w-auto">
               Save Changes
