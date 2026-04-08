@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { Navigate, Route, Routes } from "react-router-dom";
 import { ToastContainer } from "react-toastify";
 import BottomNav from "./components/BottomNav";
+import Footer from "./components/Footer";
 import Navbar from "./components/Navbar";
 import AdminDashboard from "./pages/AdminDashboard";
 import Home from "./pages/Home";
@@ -124,6 +125,7 @@ const App = () => {
           }
         />
       </Routes>
+      <Footer />
       {user && <BottomNav isAdmin={user.role === "admin"} />}
       <ToastContainer newestOnTop theme="colored" />
     </div>
